@@ -15,6 +15,10 @@ namespace TicTacToe
     {
         private const string PLAYER = "X";
         private const string CPU = "O";
+
+        private int playerScore = 0;
+        private int cpuScore = 0;
+
         private Button[] buttons;
 
         private int[][] winningCombinations = new int[][]
@@ -45,7 +49,7 @@ namespace TicTacToe
         private void PlayerMove(object sender, EventArgs e)
         {
             Button btn = (sender as Button);
-            if (btn is Button)
+            if(btn is Button)
                 Hit(btn, PLAYER);
         }
 
@@ -61,7 +65,7 @@ namespace TicTacToe
                 Prio1();
             }
 
-            if (val == CPU)
+            if(val == CPU)
             {
                 CheckWinner();
             }
@@ -160,29 +164,28 @@ namespace TicTacToe
             }
         }
 
-
         private bool CheckWinner()
         {
             foreach (var combo in winningCombinations)
             {
                 //Player Win
-                if (combo.All(i => buttons[i - 1].Text == PLAYER))
+                if(combo.All(i => buttons[i - 1].Text == PLAYER))
                 {
-                    MessageBox.Show("Player Wins!");
-                    ClearGame();
+                    HighlightWinningCombination (combo);
+                    CountWin(PLAYER);
                     return true;
                 }
 
                 //CPU Win
                 if (combo.All(i => buttons[i - 1].Text == CPU))
                 {
-                    MessageBox.Show("CPU Wins!");
-                    ClearGame();
+                    HighlightWinningCombination(combo);
+                    CountWin(CPU);
                     return true;
                 }
             }
 
-            if (buttons.All(btn => btn.Text != ""))
+            if(buttons.All(btn => btn.Text != ""))
             {
                 MessageBox.Show("It's a Draw!");
                 ClearGame();
@@ -192,6 +195,38 @@ namespace TicTacToe
             return false;
         }
 
+        private void HighlightWinningCombination(int[] combo)
+        {
+            foreach (var i in combo)
+                buttons[i - 1].BackColor = Color.HotPink;
+
+            Application.DoEvents();
+            Thread.Sleep(2000);
+
+            foreach (var i in combo)
+                buttons[i - 1].BackColor = Color.MediumPurple;
+        }
+
+        private void  CountWin(string winner)
+        {
+            if (winner == PLAYER) playerScore++;
+            else if (winner == CPU) cpuScore++;
+            lbl_Playerscore.Text = playerScore.ToString();
+            lbl_Computerscore.Text = cpuScore.ToString();
+
+            if(playerScore == 3 || cpuScore == 3)
+            {
+                string message = playerScore == 3 ? "Player Wins the Game!" : "Computer Wins the Game!";
+                MessageBox.Show(message);
+                playerScore = 0;
+                cpuScore = 0;
+                lbl_Playerscore.Text = playerScore.ToString();
+                lbl_Computerscore.Text = cpuScore.ToString();
+                Thread.Sleep(1000);
+            }
+
+            ClearGame();
+        }
 
         private void ClearGame()
         {
